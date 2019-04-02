@@ -96,7 +96,7 @@ namespace CrossStitchProject
             var distinctFlossesInImage = GenerateCrossStitchPattern();
             GenerateHtmlLegend(distinctFlossesInImage.ToList());
         }
-
+        //TODO: replace html with new class method calls?
         public HashSet<FlossInfo> GenerateCrossStitchPattern()
         {
             var chunkCount = 0;
@@ -117,7 +117,7 @@ namespace CrossStitchProject
                         }
 
                         flossesInImage.Add(flossInfo);
-                        if (x > 0 && x % 50 == 0)
+                        if (x > 0 && x % DefaultChunkWidth == 0)
                         {
                             htmlString.AppendLine($"<div class='u'{style}></div><br/>");
                         }
