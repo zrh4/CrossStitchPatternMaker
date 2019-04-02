@@ -15,10 +15,11 @@ namespace CrossStitchProject
         private readonly List<Bitmap> _imageChunks = new List<Bitmap>();
         private readonly Dictionary<Color, FlossInfo> _color2Floss;
         private readonly bool _isColored;
-        private const decimal PixW= 50.0M;
-        private const decimal PixH= 60.0M;
+        private const decimal ChunkWidth = 50.0M;
+        private const decimal ChunkHeight = 60.0M;
         private static string _outputPath;
-        private const string TableStart = "<table><thead><tr><th>Floss</th><th>Symbol</th></tr></thead><tbody>";
+        private const string LegendTableStart = "<table><thead><tr><th>Floss</th><th>Symbol</th></tr></thead><tbody>";
+        private const string LegendTableEnd = "</tbody></table>";
 
         public HtmlWriter(Bitmap b, Dictionary<Color, FlossInfo> c2F, bool colored, string outDir)
         {
@@ -28,31 +29,30 @@ namespace CrossStitchProject
             _color2Floss = c2F;
 
             var pictureFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            _outputPath = string.IsNullOrEmpty(outDir) 
-                ? Path.Combine(pictureFolder, "MyCrossStitch") 
-                : Path.Combine(pictureFolder, outDir);
+            if (string.IsNullOrEmpty(outDir)) { outDir = "MyCrossStitchPattern"; }
+            _outputPath = Path.Combine(pictureFolder, outDir);
 
             if (!Directory.Exists(_outputPath)) { Directory.CreateDirectory(_outputPath); }
         }
 
         private void ChunkifyImage(Bitmap b)
         {
-            var chunksX = (int)Math.Ceiling(b.Width / PixW);
-            var chunksY = (int)Math.Ceiling(b.Height / PixH);
-            for (var y = 0; y < chunksY; y++)
+            var numHorizontalChunks = (int)Math.Ceiling(b.Width / ChunkWidth);
+            var numVerticalChunks = (int)Math.Ceiling(b.Height / ChunkHeight);
+            for (var y = 0; y < numVerticalChunks;  y++)
             {
-                for (var x = 0; x < chunksX; x++)
+                for (var x = 0; x < numHorizontalChunks; x++)
                 {
-                    var wLeft = b.Width - (x + 1) * PixW;
-                    var hLeft = b.Height - (y + 1) * PixH;
-                    var width = (int)(wLeft < 0 ? wLeft + PixW: PixW);
-                    var height = (int)(hLeft < 0 ? hLeft + PixH: PixH);
-                    _imageChunks.Add(b.Clone(new Rectangle(x * (int)PixW, y * (int)PixH, width, height), PixelFormat.Format32bppArgb));
+                    var wLeft = b.Width - (x + 1) * ChunkWidth;
+                    var hLeft = b.Height - (y + 1) * ChunkHeight;
+                    var width = (int)(wLeft < 0 ? wLeft + ChunkWidth: ChunkWidth);
+                    var height = (int)(hLeft < 0 ? hLeft + ChunkHeight: ChunkHeight);
+                    _imageChunks.Add(b.Clone(new Rectangle(x * (int)ChunkWidth, y * (int)ChunkHeight, width, height), PixelFormat.Format32bppArgb));
                 }
             }
 
         }
-
+        //TODO: this is really dumb 
         private void Save(StringBuilder outString, string filename="chunk",int fileNo=-1)
         {
             File.WriteAllText(
@@ -66,24 +66,24 @@ namespace CrossStitchProject
         {
             var tableEnded = false;
             var htmlString = new StringBuilder(File.ReadAllText("legend_template.html"));
-            htmlString.AppendLine(TableStart);
+            htmlString.AppendLine(LegendTableStart);
             for (var i=0; i < flossInfos.Count;i++)
             {
                 tableEnded = false;
 
                 htmlString.AppendLine($"<tr><td>{flossInfos[i].FlossId}</td><td>{flossInfos[i].FlossSymbol}</td></tr>");
 
-                if (i > 0 && (i+1) % 50 == 0)
+                if (i > 0 && (i+1) % ChunkWidth == 0)
                 {
-                    htmlString.AppendLine("</tbody></table>");
-                    htmlString.AppendLine("<table><thead><tr><th>Floss</th><th>Symbol</th></tr></thead><tbody>");
+                    htmlString.AppendLine(LegendTableEnd);
+                    htmlString.AppendLine(LegendTableStart);
                     tableEnded = true;
                 }
             }
 
             if (!tableEnded)
             {
-                htmlString.AppendLine("</tbody></table>");
+                htmlString.AppendLine(LegendTableEnd);
             }
             Save(htmlString,"legend.html");
         }

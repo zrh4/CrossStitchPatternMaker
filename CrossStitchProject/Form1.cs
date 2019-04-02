@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CrossStitchProject
@@ -28,8 +29,12 @@ namespace CrossStitchProject
             if (string.IsNullOrEmpty(openFileDialog1.FileName)) return;
             previewButton.Enabled = false;
             Cursor.Current = Cursors.WaitCursor;
+            var filename = openFileDialog1.FileName;
+            var colorPattern = ColorCheckBox.Checked;
+            var ditherImage = ditherCB.Checked;
+            var projectName = FolderNameBox.Text;
             var crossStitcher = new CrossStitcher
-                (openFileDialog1.FileName, ColorCheckBox.Checked, ditherCB.Checked, FolderNameBox.Text);
+                (filename, colorPattern, ditherImage, projectName);
             var preview = crossStitcher.GenerateStitchBitmap();
             previewButton.Enabled = true;
             Cursor.Current = Cursors.Default;
@@ -53,8 +58,12 @@ namespace CrossStitchProject
         {
             crossStitchButton.Enabled = false;
             Cursor.Current = Cursors.WaitCursor;
+            var filename = openFileDialog1.FileName;
+            var colorPattern = ColorCheckBox.Checked;
+            var ditherImage = ditherCB.Checked;
+            var projectName = FolderNameBox.Text;
             var crossStitcher = new CrossStitcher
-                (openFileDialog1.FileName, ColorCheckBox.Checked, ditherCB.Checked, FolderNameBox.Text);
+                (filename, colorPattern, ditherImage, projectName);
             crossStitcher.GenerateCrossStitch();
             crossStitchButton.Enabled = true;
             Cursor.Current = Cursors.Default;
