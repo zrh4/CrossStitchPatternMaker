@@ -15,8 +15,8 @@ namespace CrossStitchProject
         private readonly List<Bitmap> _imageChunks = new List<Bitmap>();
         private readonly Dictionary<Color, FlossInfo> _color2Floss;
         private readonly bool _isColored;
-        private const decimal ChunkWidth = 50.0M;
-        private const decimal ChunkHeight = 60.0M;
+        private const decimal DefaultChunkWidth = 50.0M;
+        private const decimal DefaultChunkHeight = 60.0M;
         private static string _outputPath;
         private const string LegendTableStart = "<table><thead><tr><th>Floss</th><th>Symbol</th></tr></thead><tbody>";
         private const string LegendTableEnd = "</tbody></table>";
@@ -37,29 +37,33 @@ namespace CrossStitchProject
 
         private void ChunkifyImage(Bitmap b)
         {
-            var numHorizontalChunks = (int)Math.Ceiling(b.Width / ChunkWidth);
-            var numVerticalChunks = (int)Math.Ceiling(b.Height / ChunkHeight);
+            var numHorizontalChunks = (int)Math.Ceiling(b.Width / DefaultChunkWidth);
+            var numVerticalChunks = (int)Math.Ceiling(b.Height / DefaultChunkHeight);
             for (var y = 0; y < numVerticalChunks;  y++)
             {
                 for (var x = 0; x < numHorizontalChunks; x++)
                 {
-                    var wLeft = b.Width - (x + 1) * ChunkWidth;
-                    var hLeft = b.Height - (y + 1) * ChunkHeight;
-                    var width = (int)(wLeft < 0 ? wLeft + ChunkWidth: ChunkWidth);
-                    var height = (int)(hLeft < 0 ? hLeft + ChunkHeight: ChunkHeight);
-                    _imageChunks.Add(b.Clone(new Rectangle(x * (int)ChunkWidth, y * (int)ChunkHeight, width, height), PixelFormat.Format32bppArgb));
+                    var widthLeft = b.Width - (x + 1) * DefaultChunkWidth;
+                    var heightLeft = b.Height - (y + 1) * DefaultChunkHeight;
+                    var curChunkWidth = (int)(widthLeft < 0 ? widthLeft + DefaultChunkWidth: DefaultChunkWidth);
+                    var curChunkHeight = (int)(heightLeft < 0 ? heightLeft + DefaultChunkHeight: DefaultChunkHeight);
+                    var chunk = b.Clone(
+                        new Rectangle(x * (int) DefaultChunkWidth, y * (int) DefaultChunkHeight, curChunkWidth,
+                            curChunkHeight), PixelFormat.Format32bppArgb);
+                    _imageChunks.Add(chunk);
                 }
             }
 
         }
-        //TODO: this is really dumb 
-        private void Save(StringBuilder outString, string filename="chunk",int fileNo=-1)
+        private void Save(StringBuilder outString, string filename)
         {
-            File.WriteAllText(
-                filename == "chunk"
-                    ? Path.Combine(_outputPath, $"chunk{fileNo}.html")
-                    : Path.Combine(_outputPath, filename), outString.ToString());
+            File.WriteAllText(Path.Combine(_outputPath, filename), outString.ToString());
             Process.Start(_outputPath);
+        }
+
+        private void SaveChunk(StringBuilder outString, int fileNo)
+        {
+            File.WriteAllText(Path.Combine(_outputPath, $"chunk{fileNo}.html"), outString.ToString());
         }
 
         private void GenerateHtmlLegend(IReadOnlyList<FlossInfo> flossInfos)
@@ -73,7 +77,7 @@ namespace CrossStitchProject
 
                 htmlString.AppendLine($"<tr><td>{flossInfos[i].FlossId}</td><td>{flossInfos[i].FlossSymbol}</td></tr>");
 
-                if (i > 0 && (i+1) % ChunkWidth == 0)
+                if (i > 0 && (i+1) % DefaultChunkWidth == 0)
                 {
                     htmlString.AppendLine(LegendTableEnd);
                     htmlString.AppendLine(LegendTableStart);
@@ -89,11 +93,11 @@ namespace CrossStitchProject
         }
         public void GenerateHtml()
         {
-            var distinctFlossesInImage = GenerateCrossStitch();
+            var distinctFlossesInImage = GenerateCrossStitchPattern();
             GenerateHtmlLegend(distinctFlossesInImage.ToList());
         }
 
-        public HashSet<FlossInfo> GenerateCrossStitch()
+        public HashSet<FlossInfo> GenerateCrossStitchPattern()
         {
             var chunkCount = 0;
             var flossesInImage = new HashSet<FlossInfo>();
@@ -135,7 +139,7 @@ namespace CrossStitchProject
 
                 }
                 htmlString.AppendLine("</body></html>");
-                Save(htmlString,fileNo:chunkCount);
+                SaveChunk(htmlString,chunkCount);
                 chunkCount++;
             }
             return flossesInImage;
