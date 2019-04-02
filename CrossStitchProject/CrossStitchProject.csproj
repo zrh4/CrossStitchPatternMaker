@@ -79,6 +79,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="floss2hex.dat" />
+    <None Include=".travis.yml" />
     <None Include="NotoColorEmoji.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
