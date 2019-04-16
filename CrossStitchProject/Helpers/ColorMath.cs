@@ -18,7 +18,6 @@ namespace CrossStitchProject.Helpers
                 minColor = color;
             }
             return minColor;
-
         }
         public static double GetColorDistance(Color c1, Color c2)
         {
@@ -69,8 +68,8 @@ namespace CrossStitchProject.Helpers
         private static Color FloydSteinbergErrorColor(Color color, int rE, int gE, int bE, int denominator)
         {
             return Color.FromArgb(
-               PlusTruncate(color.R, ((rE * denominator) >> 4)),
-               PlusTruncate(color.G, ((gE * denominator) >> 4)),
+               PlusTruncate(color.R, (rE * denominator) >> 4),
+               PlusTruncate(color.G, (gE * denominator) >> 4),
                PlusTruncate(color.B, (bE * denominator) >> 4));
         }
     }

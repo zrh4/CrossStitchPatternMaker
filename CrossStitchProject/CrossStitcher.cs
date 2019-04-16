@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
@@ -14,22 +12,22 @@ namespace CrossStitchProject
         private Bitmap Image{ get; }
         private bool IsColorPattern { get; }
         private bool ShouldDitherImage { get; }
-        private string OutputFilename { get; }
+        private string ProjectName { get; }
         private Dictionary<Color,Floss> FlossDict { get; }
-        public CrossStitcher(Bitmap b, bool isColorPattern, bool shouldDitherImage, string outputFilename)
+        public CrossStitcher(Bitmap b, bool isColorPattern, bool shouldDitherImage, string projectName)
         {
             Image = b;
             IsColorPattern = isColorPattern;
             ShouldDitherImage = shouldDitherImage;
-            OutputFilename = outputFilename;
+            ProjectName = projectName;
             FlossDict = GenerateFlossDictionary();
         }
         public void GenerateCrossStitch()
         {
             var csBitmap = GenerateStitchBitmap();
             var htmlWriter = new HtmlWriter
-                (csBitmap,FlossDict,IsColorPattern,OutputFilename);
-            htmlWriter.GenerateHtml();
+                (csBitmap,FlossDict,IsColorPattern,ProjectName);
+            htmlWriter.BuildAndSavePattern();
         }
         public Bitmap GenerateStitchBitmap()
         {

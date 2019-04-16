@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace CrossStitchProject
@@ -36,26 +34,36 @@ namespace CrossStitchProject
             var ditherImage = ditherCB.Checked;
             var projectName = FolderNameBox.Text;
 
-            var b = new Bitmap(filename);
-            var crossStitcher = new CrossStitcher
-                (b, colorPattern, ditherImage, projectName);
-            var preview = crossStitcher.GenerateStitchBitmap();
-            previewButton.Enabled = true;
-            Cursor.Current = Cursors.Default;
-
-            using(var previewForm = new Form())
+            try
             {
-                previewForm.StartPosition = FormStartPosition.CenterScreen;
-                previewForm.Width = preview.Width+50;
-                previewForm.Height = preview.Height+50;
-                var pb = new PictureBox
+                var b = new Bitmap(filename);
+                var crossStitcher = new CrossStitcher
+                    (b, colorPattern, ditherImage, projectName);
+                var preview = crossStitcher.GenerateStitchBitmap();
+                using (var previewForm = new Form())
                 {
-                    Dock = DockStyle.Fill,
-                    Image = preview
-                };
-                previewForm.Controls.Add(pb);
-                previewForm.ShowDialog();
+                    previewForm.StartPosition = FormStartPosition.CenterScreen;
+                    previewForm.Width = preview.Width + 50;
+                    previewForm.Height = preview.Height + 50;
+                    var pb = new PictureBox
+                    {
+                        Dock = DockStyle.Fill,
+                        Image = preview
+                    };
+                    previewForm.Controls.Add(pb);
+                    previewForm.ShowDialog();
+                }
             }
+            catch (Exception ex)
+            {
+                DisplayException("Error generating preview", ex);
+            }
+            finally
+            {
+                previewButton.Enabled = true;
+                Cursor.Current = Cursors.Default;
+            }
+
         }
 
         private void CrossStitchButton_Click(object sender, EventArgs e)
@@ -85,7 +93,7 @@ namespace CrossStitchProject
             }
         }
 
-        private void DisplayException(string message, Exception e)
+        private static void DisplayException(string message, Exception e)
         {
             MessageBox.Show(e.ToString(), message, MessageBoxButtons.OK);
         }

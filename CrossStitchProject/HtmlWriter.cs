@@ -20,9 +20,14 @@ namespace CrossStitchProject
         private static string _outputPath;
         private const string LegendTableStart = "<table><thead><tr><th>Floss</th><th>Symbol</th></tr></thead><tbody>";
         private const string LegendTableEnd = "</tbody></table>";
+        public List<string> PatternChunks;
+        public string PatternLegend;
+        public HashSet<Floss> FlossesUsed;
 
         public HtmlWriter(Bitmap b, Dictionary<Color, Floss> c2F, bool colored, string outDir)
         {
+            PatternChunks = new List<string>();
+            FlossesUsed = new HashSet<Floss>();
             ChunkifyImage(b);
 
             _isColored = colored;
@@ -33,6 +38,16 @@ namespace CrossStitchProject
             _outputPath = Path.Combine(pictureFolder, outDir);
 
             if (!Directory.Exists(_outputPath)) { Directory.CreateDirectory(_outputPath); }
+        }
+        public void BuildAndSavePattern()
+        {
+            BuildCrossStitchPattern();
+            GenerateHtmlLegend();
+            for (var i = 0; i < PatternChunks.Count; i++)
+            {
+                Save(PatternChunks[i],$"chunk{i+1}.html");
+            }
+            Save(PatternLegend,"legend.html");
         }
 
         private void ChunkifyImage(Bitmap b)
@@ -53,21 +68,16 @@ namespace CrossStitchProject
                     _imageChunks.Add(chunk);
                 }
             }
-
         }
-        private void Save(StringBuilder outString, string filename)
+        private void Save(string outString, string filename)
         {
-            File.WriteAllText(Path.Combine(_outputPath, filename), outString.ToString());
+            File.WriteAllText(Path.Combine(_outputPath, filename), outString);
             Process.Start(_outputPath);
         }
 
-        private void SaveChunk(StringBuilder outString, int fileNo)
+        private void GenerateHtmlLegend()
         {
-            File.WriteAllText(Path.Combine(_outputPath, $"chunk{fileNo}.html"), outString.ToString());
-        }
-
-        private void GenerateHtmlLegend(IReadOnlyList<Floss> flosses)
-        {
+            var flosses = FlossesUsed.ToList();
             var tableEnded = false;
             var htmlString = new StringBuilder(File.ReadAllText("legend_template.html"));
             htmlString.AppendLine(LegendTableStart);
@@ -89,17 +99,12 @@ namespace CrossStitchProject
             {
                 htmlString.AppendLine(LegendTableEnd);
             }
-            Save(htmlString,"legend.html");
+
+            PatternLegend = htmlString.ToString();
         }
-        public void GenerateHtml()
+        //TODO: do something with HTML & make templates embedded resources
+        private void BuildCrossStitchPattern()
         {
-            var distinctFlossesInImage = GenerateCrossStitchPattern();
-            GenerateHtmlLegend(distinctFlossesInImage.ToList());
-        }
-        //TODO: replace html with new class method calls?
-        public HashSet<Floss> GenerateCrossStitchPattern()
-        {
-            var chunkCount = 0;
             var flossesInImage = new HashSet<Floss>();
             foreach (var chunk in _imageChunks)
             {
@@ -139,10 +144,9 @@ namespace CrossStitchProject
 
                 }
                 htmlString.AppendLine("</body></html>");
-                SaveChunk(htmlString,chunkCount);
-                chunkCount++;
+                PatternChunks.Add(htmlString.ToString());
             }
-            return flossesInImage;
+            FlossesUsed = flossesInImage;
         }
     }
 }
