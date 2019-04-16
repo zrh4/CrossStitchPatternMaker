@@ -74,13 +74,9 @@ namespace CrossStitchProject
                     (b, colorPattern, ditherImage, projectName);
                 crossStitcher.GenerateCrossStitch();
             }
-            catch (FileNotFoundException fnfe)
-            {
-                DisplayException("File not found!",fnfe);
-            }
             catch (Exception ex)
             {
-               DisplayException("Error occurred during cross stitch pattern generation",ex); 
+               DisplayException("Error occurred during generation",ex); 
             }
             finally
             {
@@ -91,10 +87,7 @@ namespace CrossStitchProject
 
         private void DisplayException(string message, Exception e)
         {
-            var dialogBox = new Form(){Text="Exception occurred."};
-            var tb = new TextBox() { Text = $"{message}{Environment.NewLine}{e.StackTrace}" };
-            dialogBox.Controls.Add(tb);
-            dialogBox.ShowDialog();
+            MessageBox.Show(e.ToString(), message, MessageBoxButtons.OK);
         }
     }
 }
