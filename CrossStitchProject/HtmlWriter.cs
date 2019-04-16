@@ -13,7 +13,7 @@ namespace CrossStitchProject
     {
         //TODO: make a lot of this stuff resources maybe and refactor to be less ugly
         private readonly List<Bitmap> _imageChunks = new List<Bitmap>();
-        private readonly Dictionary<Color, FlossInfo> _color2Floss;
+        private readonly Dictionary<Color, Floss> _color2Floss;
         private readonly bool _isColored;
         private const decimal DefaultChunkWidth = 50.0M;
         private const decimal DefaultChunkHeight = 60.0M;
@@ -21,7 +21,7 @@ namespace CrossStitchProject
         private const string LegendTableStart = "<table><thead><tr><th>Floss</th><th>Symbol</th></tr></thead><tbody>";
         private const string LegendTableEnd = "</tbody></table>";
 
-        public HtmlWriter(Bitmap b, Dictionary<Color, FlossInfo> c2F, bool colored, string outDir)
+        public HtmlWriter(Bitmap b, Dictionary<Color, Floss> c2F, bool colored, string outDir)
         {
             ChunkifyImage(b);
 
@@ -66,16 +66,16 @@ namespace CrossStitchProject
             File.WriteAllText(Path.Combine(_outputPath, $"chunk{fileNo}.html"), outString.ToString());
         }
 
-        private void GenerateHtmlLegend(IReadOnlyList<FlossInfo> flossInfos)
+        private void GenerateHtmlLegend(IReadOnlyList<Floss> flosses)
         {
             var tableEnded = false;
             var htmlString = new StringBuilder(File.ReadAllText("legend_template.html"));
             htmlString.AppendLine(LegendTableStart);
-            for (var i=0; i < flossInfos.Count;i++)
+            for (var i=0; i < flosses.Count;i++)
             {
                 tableEnded = false;
 
-                htmlString.AppendLine($"<tr><td>{flossInfos[i].FlossId}</td><td>{flossInfos[i].FlossSymbol}</td></tr>");
+                htmlString.AppendLine($"<tr><td>{flosses[i].DMC}</td><td>{flosses[i].Symbol}</td></tr>");
 
                 if (i > 0 && (i+1) % DefaultChunkWidth == 0)
                 {
@@ -97,10 +97,10 @@ namespace CrossStitchProject
             GenerateHtmlLegend(distinctFlossesInImage.ToList());
         }
         //TODO: replace html with new class method calls?
-        public HashSet<FlossInfo> GenerateCrossStitchPattern()
+        public HashSet<Floss> GenerateCrossStitchPattern()
         {
             var chunkCount = 0;
-            var flossesInImage = new HashSet<FlossInfo>();
+            var flossesInImage = new HashSet<Floss>();
             foreach (var chunk in _imageChunks)
             {
                 var htmlString = new StringBuilder(File.ReadAllText("template.html"));
@@ -111,23 +111,23 @@ namespace CrossStitchProject
                     {
                         var pC = chunk.GetPixel(x, y);
                         var style = _isColored ? $" style='background-color:rgba({pC.R},{pC.G},{pC.B},0.5)' " : "";
-                        if (!_color2Floss.TryGetValue(pC, out var flossInfo))
+                        if (!_color2Floss.TryGetValue(pC, out var floss))
                         {
                             throw new Exception("Floss dictionary invalid.");
                         }
 
-                        flossesInImage.Add(flossInfo);
+                        flossesInImage.Add(floss);
                         if (x > 0 && x % DefaultChunkWidth == 0)
                         {
                             htmlString.AppendLine($"<div class='u'{style}></div><br/>");
                         }
                         if (x >= 5 && x % 5 == 0)
                         {
-                            htmlString.AppendLine($"<div class='w x'{style}>{flossInfo.FlossSymbol}</div>");
+                            htmlString.AppendLine($"<div class='w x'{style}>{floss.Symbol}</div>");
                         }
                         else
                         {
-                            htmlString.AppendLine($"<div class='x'{style}>{flossInfo.FlossSymbol}</div>");
+                            htmlString.AppendLine($"<div class='x'{style}>{floss.Symbol}</div>");
                         }
                     }
                     if (y > 0 && (y + 1) % 5 == 0)

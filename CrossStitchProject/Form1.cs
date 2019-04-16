@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -33,8 +35,10 @@ namespace CrossStitchProject
             var colorPattern = ColorCheckBox.Checked;
             var ditherImage = ditherCB.Checked;
             var projectName = FolderNameBox.Text;
+
+            var b = new Bitmap(filename);
             var crossStitcher = new CrossStitcher
-                (filename, colorPattern, ditherImage, projectName);
+                (b, colorPattern, ditherImage, projectName);
             var preview = crossStitcher.GenerateStitchBitmap();
             previewButton.Enabled = true;
             Cursor.Current = Cursors.Default;
@@ -62,11 +66,35 @@ namespace CrossStitchProject
             var colorPattern = ColorCheckBox.Checked;
             var ditherImage = ditherCB.Checked;
             var projectName = FolderNameBox.Text;
-            var crossStitcher = new CrossStitcher
-                (filename, colorPattern, ditherImage, projectName);
-            crossStitcher.GenerateCrossStitch();
-            crossStitchButton.Enabled = true;
-            Cursor.Current = Cursors.Default;
+
+            try
+            {
+                var b = new Bitmap(filename);
+                var crossStitcher = new CrossStitcher
+                    (b, colorPattern, ditherImage, projectName);
+                crossStitcher.GenerateCrossStitch();
+            }
+            catch (FileNotFoundException fnfe)
+            {
+                DisplayException("File not found!",fnfe);
+            }
+            catch (Exception ex)
+            {
+               DisplayException("Error occurred during cross stitch pattern generation",ex); 
+            }
+            finally
+            {
+                crossStitchButton.Enabled = true;
+                Cursor.Current = Cursors.Default;
+            }
+        }
+
+        private void DisplayException(string message, Exception e)
+        {
+            var dialogBox = new Form(){Text="Exception occurred."};
+            var tb = new TextBox() { Text = $"{message}{Environment.NewLine}{e.StackTrace}" };
+            dialogBox.Controls.Add(tb);
+            dialogBox.ShowDialog();
         }
     }
 }

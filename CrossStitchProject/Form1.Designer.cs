@@ -41,8 +41,8 @@
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.Filter = "Image files (*.png, *.bmp, *.tiff) | *.png; *.bmp; *.tiff";
+            this.openFileDialog1.FileName = "";
+            this.openFileDialog1.Filter = "Image files (*.png, *.bmp, *.tiff, *.jpg, *.jpeg) | *.png; *.bmp; *.tiff; *.jpg; *.jpeg";
             this.openFileDialog1.Title = "Select an image file";
             // 
             // browseButton
