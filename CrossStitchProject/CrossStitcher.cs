@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using CrossStitchProject.Helpers;
+using CrossStitchProject.Models;
 
 namespace CrossStitchProject
 {
@@ -25,7 +26,7 @@ namespace CrossStitchProject
         public void GenerateCrossStitch()
         {
             var csBitmap = GenerateStitchBitmap();
-            var htmlWriter = new HtmlWriter
+            var htmlWriter = new PatternWriter
                 (csBitmap,FlossDict,IsColorPattern,ProjectName);
             htmlWriter.BuildAndSavePattern();
         }

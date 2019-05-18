@@ -1,6 +1,6 @@
-﻿namespace CrossStitchProject
+﻿namespace CrossStitchProject.Models
 {
-    internal class Floss
+    public class Floss
     {
         public string DMC { get; set; }
         public string Symbol { get; set; }

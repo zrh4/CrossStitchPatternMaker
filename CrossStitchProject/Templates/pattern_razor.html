@@ -1,0 +1,112 @@
+﻿@model CrossStitchProject.Models.PatternChunk
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<head>
+    <title>template</title>
+    <meta charset="UTF-8">
+    <style>
+        @@font-face {
+            font-family: emoji;
+            src: url("../NotoColorEmoji.ttf");
+        }
+
+        .x {
+            font-family: monospace;
+            font-size: 1em;
+            border: 1px solid;
+            overflow: hidden;
+            width: 1em;
+            height: 1em;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 1em;
+            box-sizing: content-box;
+            float: left;
+        }
+
+        .y {
+            visibility: hidden;
+        }
+
+        .z {
+            font-family: monospace;
+            font-size: .5em;
+            overflow: hidden;
+            width: 2em;
+            height: 2em;
+            text-align: center;
+            vertical-align: middle;
+            box-sizing: content-box;
+            float: left;
+            border-right: 1px solid;
+        }
+
+        .v {
+            border-bottom: 2px dashed !important;
+        }
+
+        .u {
+            font-family: monospace;
+            font-size: .5em;
+            overflow: hidden;
+            width: 2em;
+            height: 2em;
+            box-sizing: content-box;
+            float: left;
+            border-bottom: 1px solid;
+            margin-bottom: 1px;
+            text-align: right;
+            vertical-align: middle;
+            line-height: 3.1em;
+        }
+
+        br {
+            line-height: .8125em;
+        }
+
+        .q {
+            width: 50em;
+            height: 1em;
+        }
+    </style>
+</head>
+<body>
+                @for (var y = 0; y < Model.Chunk.Height; y++)
+                {
+                    <div class='q'>
+                    @for (var x = 0; x < Model.Chunk.Width; x++)
+                    {
+                        var pC = Model.Chunk.GetPixel(x, y);
+                        var style = Model.IsColorPattern ?
+    string.Format("background-color:rgba({0},{1},{2},0.5)",pC.R,pC.G,pC.B) :
+    "";
+                        CrossStitchProject.Models.Floss floss;
+
+                        if (!Model.ColorToFlossDict.TryGetValue(pC, out floss))
+                        {
+                            throw new Exception("Floss dictionary invalid.");
+                        }
+
+                        if (x > 0 && x % 50== 0)
+                        {
+                            <div class='u' style="@style"></div><br/>
+                        }
+                        if (x >= 5 && x % 5 == 0)
+                        {
+                            <div class='w x' style="@style">@floss.Symbol</div>
+                        }
+                        else
+                        {
+                            <div class='x' style="@style">@floss.Symbol</div>
+                        }
+                    }
+                    @if (y > 0 && (y + 1) % 5 == 0)
+                    {
+                        <div class='u'>@(y + 1)</div>
+                    }
+
+                    </div>
+
+                }
+</body>
+</html>
