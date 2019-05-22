@@ -53,6 +53,7 @@ namespace CrossStitchProject
                 Save(PatternChunks[i], $"chunk{i + 1}.html");
             }
             Save(PatternLegend, "legend.html");
+            Process.Start(_outputPath);
         }
 
         private void ChunkifyImage(Bitmap b)
@@ -78,7 +79,6 @@ namespace CrossStitchProject
         private void Save(string outString, string filename)
         {
             File.WriteAllText(Path.Combine(_outputPath, filename), outString);
-            Process.Start(_outputPath);
         }
 
         private void BuildLegend()
