@@ -68,45 +68,61 @@
             width: 50em;
             height: 1em;
         }
+        .longRightBorder{
+            font-family: monospace;
+            font-size: .5em;
+            height:2em;
+            width:11.4em;
+            box-sizing: content-box;
+            float: left;
+            border-right:1px solid;
+            text-align:right;
+            line-height: 3.1em;
+        }
     </style>
 </head>
 <body>
-                @for (var y = 0; y < Model.Chunk.Height; y++)
-                {
-                    <div class='q'>
-                    @for (var x = 0; x < Model.Chunk.Width; x++)
-                    {
-                        var pC = Model.Chunk.GetPixel(x, y);
-                        var style = Model.IsColorPattern ?
-    string.Format("background-color:rgba({0},{1},{2},0.5)",pC.R,pC.G,pC.B) :
-    "";
-                        CrossStitchProject.Models.Floss floss;
+    @for (var y = 0; y < Model.Chunk.Height; y++)
+    {
+    <div class='q'>
+        @for (var x = 0; x < Model.Chunk.Width; x++)
+        {
+        var pC = Model.Chunk.GetPixel(x, y);
+        var style = Model.IsColorPattern ?
+        string.Format("background-color:rgba({0},{1},{2},0.5)",pC.R,pC.G,pC.B) :
+        "";
+        CrossStitchProject.Models.Floss floss;
 
-                        if (!Model.ColorToFlossDict.TryGetValue(pC, out floss))
-                        {
-                            throw new Exception("Floss dictionary invalid.");
-                        }
+        if (!Model.ColorToFlossDict.TryGetValue(pC, out floss))
+        {
+        throw new Exception("Floss dictionary invalid.");
+        }
 
-                        if (x > 0 && x % 50== 0)
-                        {
-                            <div class='u' style="@style"></div><br/>
-                        }
-                        if (x >= 5 && x % 5 == 0)
-                        {
-                            <div class='w x' style="@style">@floss.Symbol</div>
-                        }
-                        else
-                        {
-                            <div class='x' style="@style">@floss.Symbol</div>
-                        }
-                    }
-                    @if (y > 0 && (y + 1) % 5 == 0)
-                    {
-                        <div class='u'>@(y + 1)</div>
-                    }
+        if (x > 0 && x % 50== 0)
+        {
+        <div class='u' style="@style"></div><br />
+        }
+        if (x >= 5 && x % 5 == 0)
+        {
+        <div class='w x' style="@style">@floss.Symbol</div>
+        }
+        else
+        {
+        <div class='x' style="@style">@floss.Symbol</div>
+        }
+        }
+        @if (y > 0 && (y + 1) % 5 == 0)
+        {
+        <div class='u'>@(Model.StartY + y + 1)</div>
+        }
 
-                    </div>
+    </div>
 
-                }
+    }
+    @for(var x=0;x< Model.Chunk.Width;x++){
+    if(x > 0 && (x+1)%5==0){
+        <div class='longRightBorder'>@(Model.StartX + x + 1)</div>
+    }
+    }
 </body>
 </html>

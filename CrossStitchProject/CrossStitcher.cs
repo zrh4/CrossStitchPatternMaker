@@ -10,64 +10,89 @@ namespace CrossStitchProject
 {
     public class CrossStitcher
     {
-        private Bitmap Image{ get; }
+        private Bitmap Picture { get; }
         private bool IsColorPattern { get; }
         private bool ShouldDitherImage { get; }
         private string ProjectName { get; }
-        private Dictionary<Color,Floss> FlossDict { get; }
         public CrossStitcher(Bitmap b, bool isColorPattern, bool shouldDitherImage, string projectName)
         {
-            Image = b;
+            Picture = b;
             IsColorPattern = isColorPattern;
             ShouldDitherImage = shouldDitherImage;
             ProjectName = projectName;
-            FlossDict = GenerateFlossDictionary();
         }
         public void GenerateCrossStitch()
         {
-            var csBitmap = GenerateStitchBitmap();
-            var htmlWriter = new PatternWriter
-                (csBitmap,FlossDict,IsColorPattern,ProjectName);
-            htmlWriter.BuildAndSavePattern();
+            var flossColors = GetFlossColors();
+            var csBitmap = GenerateStitchBitmap(flossColors);
+            var flossDict = GenerateFlossDictionary(csBitmap);
+            var patternWriter = new PatternWriter
+                (csBitmap, flossDict, IsColorPattern, ProjectName);
+            patternWriter.Build();
+            patternWriter.Save();
         }
-        public Bitmap GenerateStitchBitmap()
+        public Bitmap GenerateStitchBitmap() => GenerateStitchBitmap(GetFlossColors());
+        public Bitmap GenerateStitchBitmap(List<Color> validColors)
         {
-            var validColors = FlossDict.Keys.ToList();
             var colorMap = new Dictionary<Color, Color>();
-            for (var y = 0; y < Image.Height; y++)
+            for (var y = 0; y < Picture.Height; y++)
             {
-                for (var x = 0; x < Image.Width; x++)
+                for (var x = 0; x < Picture.Width; x++)
                 {
-                    var origColor = Image.GetPixel(x, y);
-                    if(!colorMap.TryGetValue(origColor,out var closest))
+                    var origColor = Picture.GetPixel(x, y);
+                    if (!colorMap.TryGetValue(origColor, out var closest))
                     {
                         closest = ColorMath.GetClosestColor(validColors, origColor);
                         colorMap.Add(origColor, closest);
                     }
-                    Image.SetPixel(x,y,closest);
+                    Picture.SetPixel(x, y, closest);
                     if (!ShouldDitherImage) continue;
-                    ColorMath.FloydSteinberg(Image,origColor,closest,x,y);
-
+                    ColorMath.FloydSteinberg(Picture, origColor, closest, x, y);
                 }
             }
-            return Image;
+            return Picture;
         }
-        private static Dictionary<Color, Floss> GenerateFlossDictionary()
+        public static List<Color> GetFlossColors()
         {
-            var hex2Floss = new Dictionary<Color, Floss>();
-            using (var stream = Assembly.GetExecutingAssembly()
+            var flosses = new List<Color>();
+            using (var flossStream = Assembly.GetExecutingAssembly()
                 .GetManifestResourceStream("CrossStitchProject.floss2hex.dat"))
-            using (var reader = new StreamReader(stream))
+            using (var flossReader = new StreamReader(flossStream))
             {
-                while (!reader.EndOfStream)
+                while (!flossReader.EndOfStream)
                 {
-                    var line = reader.ReadLine();
+                    var line = flossReader.ReadLine();
                     var splitLine = line.Split(' ');
                     var flossColor = ColorTranslator.FromHtml(splitLine[1]);
-                    hex2Floss.Add(flossColor, new Floss { DMC = splitLine[0], Symbol = splitLine[2] });
+                    flosses.Add(flossColor);
                 }
             }
-            return hex2Floss;
+            return flosses;
+        }
+        private static Dictionary<Color,Floss> GenerateFlossDictionary(Bitmap image)
+        {
+            var colorsNeeded = ImageHelper.GetColors(image);
+            var dict = new Dictionary<Color, Floss>();
+            var symbolEnumerator = Symbols.GetSymbols().GetEnumerator();
+            using (var flossStream = Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream("CrossStitchProject.floss2hex.dat"))
+            using (var flossReader = new StreamReader(flossStream))
+            {
+                while (!flossReader.EndOfStream)
+                {
+                    var line = flossReader.ReadLine();
+                    var splitLine = line.Split(' ');
+                    var flossColor = ColorTranslator.FromHtml(splitLine[1]);
+                    if (!colorsNeeded.Contains(flossColor)) { continue; }
+                    dict.Add(flossColor, new Floss
+                    {
+                        DMC = int.Parse(splitLine[0]),
+                        Symbol = symbolEnumerator.Current
+                    });
+                    symbolEnumerator.MoveNext();
+                }
+            }
+            return dict;
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class Floss
     {
-        public string DMC { get; set; }
+        public int DMC { get; set; }
         public string Symbol { get; set; }
     }
 }

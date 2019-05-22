@@ -15,57 +15,65 @@ namespace CrossStitchProject
 {
     public class PatternWriter
     {
-        private readonly List<Bitmap> _imageChunks = new List<Bitmap>();
+        public List<List<Bitmap>> _imageChunks = new List<List<Bitmap>>();
+        public List<string> PatternChunks;
+        public string PatternLegend;
         private readonly Dictionary<Color, Floss> _color2Floss;
-        private readonly bool _isColored;
+        private readonly bool _isColorPattern;
         private const decimal DefaultChunkWidth = 50.0M;
         private const decimal DefaultChunkHeight = 60.0M;
         private static string _outputPath;
-        public List<string> PatternChunks;
-        public string PatternLegend;
+        const string CrossStitchFolderName = "Cross Stitch Patterns";
 
         public PatternWriter(Bitmap b, Dictionary<Color, Floss> c2F, bool colored, string outDir)
         {
             PatternChunks = new List<string>();
             ChunkifyImage(b);
 
-            _isColored = colored;
+            _isColorPattern = colored;
             _color2Floss = c2F;
 
             var pictureFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            var crossStitchFolder = Path.Combine(pictureFolder, CrossStitchFolderName);
             if (string.IsNullOrEmpty(outDir)) { outDir = "MyCrossStitchPattern"; }
-            _outputPath = Path.Combine(pictureFolder, outDir);
+            _outputPath = Path.Combine(crossStitchFolder, outDir);
 
+            if (!Directory.Exists(crossStitchFolder)) { Directory.CreateDirectory(crossStitchFolder); }
             if (!Directory.Exists(_outputPath)) { Directory.CreateDirectory(_outputPath); }
         }
-        public void BuildAndSavePattern()
+        public void Build()
         {
-            var task = Task.Factory.StartNew(() => GetDistinctFlossesInImage());
             BuildCrossStitchPattern();
-            GenerateHtmlLegend(task.Result);
+            BuildLegend();
+        }
+        public void Save()
+        {
             for (var i = 0; i < PatternChunks.Count; i++)
             {
-                Save(PatternChunks[i],$"chunk{i+1}.html");
+                Save(PatternChunks[i], $"chunk{i + 1}.html");
             }
-            Save(PatternLegend,"legend.html");
+            Save(PatternLegend, "legend.html");
         }
 
         private void ChunkifyImage(Bitmap b)
         {
             var numHorizontalChunks = (int)Math.Ceiling(b.Width / DefaultChunkWidth);
             var numVerticalChunks = (int)Math.Ceiling(b.Height / DefaultChunkHeight);
-            for (var y = 0; y < numVerticalChunks;  y++)
+            for (var y = 0; y < numVerticalChunks; y++)
+            {
+                _imageChunks.Add(new List<Bitmap>());
                 for (var x = 0; x < numHorizontalChunks; x++)
                 {
                     var widthLeft = b.Width - (x + 1) * DefaultChunkWidth;
                     var heightLeft = b.Height - (y + 1) * DefaultChunkHeight;
-                    var curChunkWidth = (int)(widthLeft < 0 ? widthLeft + DefaultChunkWidth: DefaultChunkWidth);
-                    var curChunkHeight = (int)(heightLeft < 0 ? heightLeft + DefaultChunkHeight: DefaultChunkHeight);
+                    var curChunkWidth = (int)(widthLeft < 0 ? widthLeft + DefaultChunkWidth : DefaultChunkWidth);
+                    var curChunkHeight = (int)(heightLeft < 0 ? heightLeft + DefaultChunkHeight : DefaultChunkHeight);
                     var chunk = b.Clone(
-                        new Rectangle(x * (int) DefaultChunkWidth, y * (int) DefaultChunkHeight, curChunkWidth,
+                        new Rectangle(x * (int)DefaultChunkWidth, y * (int)DefaultChunkHeight, curChunkWidth,
                             curChunkHeight), PixelFormat.Format32bppArgb);
-                    _imageChunks.Add(chunk);
+                    _imageChunks[y].Add(chunk);
                 }
+            }
         }
         private void Save(string outString, string filename)
         {
@@ -73,34 +81,32 @@ namespace CrossStitchProject
             Process.Start(_outputPath);
         }
 
-        private void GenerateHtmlLegend(HashSet<Floss> flosses)
+        private void BuildLegend()
         {
-            var model = flosses.ToList();
+            var model = _color2Floss.Values.OrderBy(x => x.DMC).ToList();
             var template = File.ReadAllText("Templates/legend_razor.html");
-            var result = Engine.Razor.RunCompile(template,"legendKey", null, model);
+            var result = Engine.Razor.RunCompile(template, "legendKey", null, model);
             PatternLegend = result;
         }
         private void BuildCrossStitchPattern()
         {
-            foreach (var chunk in _imageChunks)
-            {
-                var template = File.ReadAllText("Templates/pattern_razor.html");
-                var model = new PatternChunk { Chunk = chunk, ColorToFlossDict = _color2Floss, IsColorPattern = _isColored };
-                //Engine.Razor = RazorEngineService.Create(new TemplateServiceConfiguration { Debug = true });
-                var result = Engine.Razor.RunCompile(template,"patternKey", null, model);
-                PatternChunks.Add(result);
-            }
-        }
-        private HashSet<Floss> GetDistinctFlossesInImage()
-        {
-            var flossesUsed = new HashSet<Floss>();
-            foreach (var chunk in _imageChunks)
-                for (var y = 0; y < chunk.Height; y++)
-                    for (var x = 0; x < chunk.Width; x++)
+            for (var y = 0; y < _imageChunks.Count; y++)
+                for (var x = 0; x < _imageChunks[y].Count; x++)
+                {
+                    var startY = y * (int)DefaultChunkHeight;
+                    var startX = x * (int)DefaultChunkWidth;
+                    var template = File.ReadAllText("Templates/pattern_razor.html");
+                    var model = new PatternChunk
                     {
-                        flossesUsed.Add(_color2Floss[chunk.GetPixel(x, y)]);
-                    }
-            return flossesUsed;
+                        Chunk = _imageChunks[y][x],
+                        ColorToFlossDict = _color2Floss,
+                        IsColorPattern = _isColorPattern,
+                        StartX = startX,
+                        StartY = startY
+                    };
+                    var result = Engine.Razor.RunCompile(template, "patternKey", null, model);
+                    PatternChunks.Add(result);
+                }
         }
     }
 }

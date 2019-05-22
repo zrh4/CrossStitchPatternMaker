@@ -12,5 +12,7 @@ namespace CrossStitchProject.Models
         public bool IsColorPattern { get; set; }
         public Bitmap Chunk { get; set; }
         public Dictionary<Color, Floss> ColorToFlossDict { get; set; }
+        public int StartX { get; set; }
+        public int StartY { get; set; }
     }
 }
