@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace CrossStitchProject
@@ -28,7 +29,39 @@ namespace CrossStitchProject
         {
             if (string.IsNullOrEmpty(openFileDialog1.FileName)) return;
             previewButton.Enabled = false;
+            ShowWaitCursor();
+            if (!previewWorker.IsBusy)
+            {
+                previewWorker.RunWorkerAsync();
+            }
+        }
+
+        private void CrossStitchButton_Click(object sender, EventArgs e)
+        {
+            crossStitchButton.Enabled = false;
+            ShowWaitCursor();
+            if (!previewWorker.IsBusy)
+            {
+                patternWorker.RunWorkerAsync();
+            }
+        }
+        private static void ShowWaitCursor()
+        {
+            Application.UseWaitCursor = true;
             Cursor.Current = Cursors.WaitCursor;
+        }
+        private static void ShowNormalCursor()
+        {
+            Application.UseWaitCursor = false;
+            Cursor.Current = Cursors.Default;
+        }
+        private static void DisplayException(string message, Exception e)
+        {
+            MessageBox.Show(e.ToString(), message, MessageBoxButtons.OK);
+        }
+
+        private void PreviewWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
             var filename = openFileDialog1.FileName;
             var colorPattern = ColorCheckBox.Checked;
             var ditherImage = ditherCB.Checked;
@@ -40,6 +73,25 @@ namespace CrossStitchProject
                 var crossStitcher = new CrossStitcher
                     (b, colorPattern, ditherImage, projectName);
                 var preview = crossStitcher.GenerateStitchBitmap();
+                e.Result = preview;
+            }
+            catch (Exception ex)
+            {
+                e.Result = ex;
+                previewWorker.CancelAsync();
+            }
+        }
+        private void PreviewWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                DisplayException("Error generating preview", (Exception)e.Result);
+            }
+            else
+            {
+                previewButton.Enabled = true;
+                ShowNormalCursor();
+                var preview = (Bitmap)e.Result;
                 using (var previewForm = new Form())
                 {
                     previewForm.StartPosition = FormStartPosition.CenterScreen;
@@ -54,22 +106,10 @@ namespace CrossStitchProject
                     previewForm.ShowDialog();
                 }
             }
-            catch (Exception ex)
-            {
-                DisplayException("Error generating preview", ex);
-            }
-            finally
-            {
-                previewButton.Enabled = true;
-                Cursor.Current = Cursors.Default;
-            }
-
         }
 
-        private void CrossStitchButton_Click(object sender, EventArgs e)
+        private void PatternWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            crossStitchButton.Enabled = false;
-            Cursor.Current = Cursors.WaitCursor;
             var filename = openFileDialog1.FileName;
             var colorPattern = ColorCheckBox.Checked;
             var ditherImage = ditherCB.Checked;
@@ -84,18 +124,21 @@ namespace CrossStitchProject
             }
             catch (Exception ex)
             {
-               DisplayException("Error occurred during generation",ex); 
-            }
-            finally
-            {
-                crossStitchButton.Enabled = true;
-                Cursor.Current = Cursors.Default;
+                e.Result = ex;
+                patternWorker.CancelAsync();
             }
         }
-
-        private static void DisplayException(string message, Exception e)
+        private void PatternWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            MessageBox.Show(e.ToString(), message, MessageBoxButtons.OK);
+            if (e.Cancelled)
+            {
+                DisplayException("Error generating preview", (Exception)e.Result);
+            }
+            else
+            {
+                crossStitchButton.Enabled = true;
+                ShowNormalCursor();
+            }
         }
     }
 }

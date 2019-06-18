@@ -37,12 +37,14 @@
             this.SaveLabel = new System.Windows.Forms.Label();
             this.FolderNameBox = new System.Windows.Forms.TextBox();
             this.ditherCB = new System.Windows.Forms.CheckBox();
+            this.previewWorker = new System.ComponentModel.BackgroundWorker();
+            this.patternWorker = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.FileName = "";
-            this.openFileDialog1.Filter = "Image files (*.png, *.bmp, *.tiff, *.jpg, *.jpeg) | *.png; *.bmp; *.tiff; *.jpg; *.jpeg";
+            this.openFileDialog1.Filter = "Image files (*.png, *.bmp, *.tiff, *.jpg, *.jpeg) | *.png; *.bmp; *.tiff; *.jpg; " +
+    "*.jpeg";
             this.openFileDialog1.Title = "Select an image file";
             // 
             // browseButton
@@ -120,6 +122,18 @@
             this.ditherCB.Text = "Dither image";
             this.ditherCB.UseVisualStyleBackColor = true;
             // 
+            // previewWorker
+            // 
+            this.previewWorker.WorkerSupportsCancellation = true;
+            this.previewWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.PreviewWorker_DoWork);
+            this.previewWorker.RunWorkerCompleted += this.PreviewWorker_RunWorkerCompleted;
+            // 
+            // patternWorker
+            // 
+            this.patternWorker.WorkerSupportsCancellation = true;
+            this.patternWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.PatternWorker_DoWork);
+            this.patternWorker.RunWorkerCompleted += this.PatternWorker_RunWorkerCompleted;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -151,6 +165,8 @@
         private System.Windows.Forms.Label SaveLabel;
         private System.Windows.Forms.TextBox FolderNameBox;
         private System.Windows.Forms.CheckBox ditherCB;
+        private System.ComponentModel.BackgroundWorker previewWorker;
+        private System.ComponentModel.BackgroundWorker patternWorker;
     }
 }
 
