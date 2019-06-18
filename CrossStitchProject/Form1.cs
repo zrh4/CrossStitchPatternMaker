@@ -77,34 +77,27 @@ namespace CrossStitchProject
             }
             catch (Exception ex)
             {
-                e.Result = ex;
-                previewWorker.CancelAsync();
+                DisplayException("Error generating preview", ex);
             }
         }
         private void PreviewWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Cancelled)
+            previewButton.Enabled = true;
+            ShowNormalCursor();
+            if (e.Result == null) { return; }
+            var preview = (Bitmap)e.Result;
+            using (var previewForm = new Form())
             {
-                DisplayException("Error generating preview", (Exception)e.Result);
-            }
-            else
-            {
-                previewButton.Enabled = true;
-                ShowNormalCursor();
-                var preview = (Bitmap)e.Result;
-                using (var previewForm = new Form())
+                previewForm.StartPosition = FormStartPosition.CenterScreen;
+                previewForm.Width = preview.Width + 50;
+                previewForm.Height = preview.Height + 50;
+                var pb = new PictureBox
                 {
-                    previewForm.StartPosition = FormStartPosition.CenterScreen;
-                    previewForm.Width = preview.Width + 50;
-                    previewForm.Height = preview.Height + 50;
-                    var pb = new PictureBox
-                    {
-                        Dock = DockStyle.Fill,
-                        Image = preview
-                    };
-                    previewForm.Controls.Add(pb);
-                    previewForm.ShowDialog();
-                }
+                    Dock = DockStyle.Fill,
+                    Image = preview
+                };
+                previewForm.Controls.Add(pb);
+                previewForm.ShowDialog();
             }
         }
 
@@ -124,21 +117,13 @@ namespace CrossStitchProject
             }
             catch (Exception ex)
             {
-                e.Result = ex;
-                patternWorker.CancelAsync();
+                DisplayException("Error generating pattern", ex);
             }
         }
         private void PatternWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Cancelled)
-            {
-                DisplayException("Error generating preview", (Exception)e.Result);
-            }
-            else
-            {
-                crossStitchButton.Enabled = true;
-                ShowNormalCursor();
-            }
+            crossStitchButton.Enabled = true;
+            ShowNormalCursor();
         }
     }
 }
