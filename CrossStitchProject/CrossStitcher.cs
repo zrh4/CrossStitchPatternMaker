@@ -74,6 +74,7 @@ namespace CrossStitchProject
             var colorsNeeded = ImageHelper.GetColors(image);
             var dict = new Dictionary<Color, Floss>();
             var symbolEnumerator = Symbols.GetSymbols().GetEnumerator();
+            symbolEnumerator.MoveNext();
             using (var flossStream = Assembly.GetExecutingAssembly()
                 .GetManifestResourceStream("CrossStitchProject.floss2hex.dat"))
             using (var flossReader = new StreamReader(flossStream))
