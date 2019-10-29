@@ -1,4 +1,4 @@
-﻿namespace CrossStitchProject
+﻿namespace CrossStitchPatternMaker
 {
     partial class Form1
     {

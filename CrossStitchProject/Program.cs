@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace CrossStitchProject
+namespace CrossStitchPatternMaker
 {
     internal static class Program
     {

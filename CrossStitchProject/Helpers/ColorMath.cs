@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace CrossStitchProject.Helpers
+namespace CrossStitchPatternMaker.Helpers
 {
     public static class ColorMath
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CrossStitchProject.Helpers
+namespace CrossStitchPatternMaker.Helpers
 {
     public class ImageHelper
     {

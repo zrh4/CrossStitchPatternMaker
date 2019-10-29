@@ -3,7 +3,7 @@ using System.Drawing;
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace CrossStitchProject
+namespace CrossStitchPatternMaker
 {
     public partial class Form1 : Form
     {

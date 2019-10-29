@@ -8,10 +8,10 @@ using RazorEngine;
 using RazorEngine.Templating;
 using System.Linq;
 using RazorEngine.Configuration;
-using CrossStitchProject.Models;
+using CrossStitchPatternMaker.Models;
 using System.Threading.Tasks;
 
-namespace CrossStitchProject
+namespace CrossStitchPatternMaker
 {
     public class PatternWriter
     {

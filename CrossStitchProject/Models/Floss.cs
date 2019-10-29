@@ -1,4 +1,4 @@
-﻿namespace CrossStitchProject.Models
+﻿namespace CrossStitchPatternMaker.Models
 {
     public class Floss
     {

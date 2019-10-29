@@ -3,10 +3,10 @@ using System.Linq;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using CrossStitchProject.Helpers;
-using CrossStitchProject.Models;
+using CrossStitchPatternMaker.Helpers;
+using CrossStitchPatternMaker.Models;
 
-namespace CrossStitchProject
+namespace CrossStitchPatternMaker
 {
     public class CrossStitcher
     {

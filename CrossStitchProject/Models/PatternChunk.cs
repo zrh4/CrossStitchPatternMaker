@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CrossStitchProject.Models
+namespace CrossStitchPatternMaker.Models
 {
     public class PatternChunk
     {
