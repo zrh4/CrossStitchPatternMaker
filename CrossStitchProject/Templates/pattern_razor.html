@@ -1,4 +1,4 @@
-﻿@model CrossStitchProject.Models.PatternChunk
+﻿@model CrossStitchPatternMaker.Models.PatternChunk
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
         var style = Model.IsColorPattern ?
         string.Format("background-color:rgba({0},{1},{2},0.5)",pC.R,pC.G,pC.B) :
         "";
-        CrossStitchProject.Models.Floss floss;
+        CrossStitchPatternMaker.Models.Floss floss;
 
         if (!Model.ColorToFlossDict.TryGetValue(pC, out floss))
         {

@@ -13,7 +13,7 @@ namespace CrossStitchPatternMaker.Helpers
         public static IEnumerable<string> GetSymbols()
         {
             using (var symbolStream = Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream("CrossStitchProject.symbols.dat"))
+                .GetManifestResourceStream("CrossStitchPatternMaker.symbols.dat"))
             using (var symbolReader = new StreamReader(symbolStream))
             {
                 while(!symbolReader.EndOfStream)

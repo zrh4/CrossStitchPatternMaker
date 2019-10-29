@@ -56,7 +56,7 @@ namespace CrossStitchPatternMaker
         {
             var flosses = new List<Color>();
             using (var flossStream = Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream("CrossStitchProject.floss2hex.dat"))
+                .GetManifestResourceStream("CrossStitchPatternMaker.floss2hex.dat"))
             using (var flossReader = new StreamReader(flossStream))
             {
                 while (!flossReader.EndOfStream)
@@ -76,7 +76,7 @@ namespace CrossStitchPatternMaker
             var symbolEnumerator = Symbols.GetSymbols().GetEnumerator();
             symbolEnumerator.MoveNext();
             using (var flossStream = Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream("CrossStitchProject.floss2hex.dat"))
+                .GetManifestResourceStream("CrossStitchPatternMaker.floss2hex.dat"))
             using (var flossReader = new StreamReader(flossStream))
             {
                 while (!flossReader.EndOfStream)
