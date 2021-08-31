@@ -5,9 +5,9 @@ using System.Windows.Forms;
 
 namespace CrossStitchPatternMaker
 {
-    public partial class Form1 : Form
+    public partial class PatternMakerMainForm : Form
     {
-        public Form1()
+        public PatternMakerMainForm()
         {
             InitializeComponent();
         }

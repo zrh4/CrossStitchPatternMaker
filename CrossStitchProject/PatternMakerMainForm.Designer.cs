@@ -1,6 +1,6 @@
 ﻿namespace CrossStitchPatternMaker
 {
-    partial class Form1
+    partial class PatternMakerMainForm
     {
         /// <summary>
         /// Required designer variable.
