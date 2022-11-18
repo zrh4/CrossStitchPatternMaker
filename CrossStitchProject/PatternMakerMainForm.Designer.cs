@@ -39,6 +39,7 @@
             this.ditherCB = new System.Windows.Forms.CheckBox();
             this.previewWorker = new System.ComponentModel.BackgroundWorker();
             this.patternWorker = new System.ComponentModel.BackgroundWorker();
+            this.labelPatternOptions1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -59,28 +60,28 @@
             // 
             // previewButton
             // 
-            this.previewButton.Location = new System.Drawing.Point(12, 28);
+            this.previewButton.Location = new System.Drawing.Point(12, 81);
             this.previewButton.Name = "previewButton";
-            this.previewButton.Size = new System.Drawing.Size(75, 23);
+            this.previewButton.Size = new System.Drawing.Size(111, 23);
             this.previewButton.TabIndex = 3;
-            this.previewButton.Text = "Preview";
+            this.previewButton.Text = "Preview Colors";
             this.previewButton.UseVisualStyleBackColor = true;
             this.previewButton.Click += new System.EventHandler(this.PreviewButton_Click);
             // 
             // crossStitchButton
             // 
-            this.crossStitchButton.Location = new System.Drawing.Point(12, 57);
+            this.crossStitchButton.Location = new System.Drawing.Point(190, 81);
             this.crossStitchButton.Name = "crossStitchButton";
-            this.crossStitchButton.Size = new System.Drawing.Size(75, 23);
+            this.crossStitchButton.Size = new System.Drawing.Size(123, 23);
             this.crossStitchButton.TabIndex = 4;
-            this.crossStitchButton.Text = "Generate";
+            this.crossStitchButton.Text = "Generate!";
             this.crossStitchButton.UseVisualStyleBackColor = true;
             this.crossStitchButton.Click += new System.EventHandler(this.CrossStitchButton_Click);
             // 
             // ColorCheckBox
             // 
             this.ColorCheckBox.AutoSize = true;
-            this.ColorCheckBox.Location = new System.Drawing.Point(179, 32);
+            this.ColorCheckBox.Location = new System.Drawing.Point(221, 32);
             this.ColorCheckBox.Name = "ColorCheckBox";
             this.ColorCheckBox.Size = new System.Drawing.Size(92, 17);
             this.ColorCheckBox.TabIndex = 5;
@@ -93,13 +94,13 @@
             this.fileLabel.Enabled = false;
             this.fileLabel.Location = new System.Drawing.Point(94, 6);
             this.fileLabel.Name = "fileLabel";
-            this.fileLabel.Size = new System.Drawing.Size(177, 20);
+            this.fileLabel.Size = new System.Drawing.Size(219, 20);
             this.fileLabel.TabIndex = 6;
             // 
             // SaveLabel
             // 
             this.SaveLabel.AutoSize = true;
-            this.SaveLabel.Location = new System.Drawing.Point(91, 62);
+            this.SaveLabel.Location = new System.Drawing.Point(9, 58);
             this.SaveLabel.Name = "SaveLabel";
             this.SaveLabel.Size = new System.Drawing.Size(83, 13);
             this.SaveLabel.TabIndex = 7;
@@ -107,38 +108,48 @@
             // 
             // FolderNameBox
             // 
-            this.FolderNameBox.Location = new System.Drawing.Point(179, 59);
+            this.FolderNameBox.Location = new System.Drawing.Point(101, 55);
             this.FolderNameBox.Name = "FolderNameBox";
-            this.FolderNameBox.Size = new System.Drawing.Size(89, 20);
+            this.FolderNameBox.Size = new System.Drawing.Size(212, 20);
             this.FolderNameBox.TabIndex = 8;
             // 
             // ditherCB
             // 
             this.ditherCB.AutoSize = true;
-            this.ditherCB.Location = new System.Drawing.Point(94, 32);
+            this.ditherCB.Location = new System.Drawing.Point(110, 32);
             this.ditherCB.Name = "ditherCB";
-            this.ditherCB.Size = new System.Drawing.Size(85, 17);
+            this.ditherCB.Size = new System.Drawing.Size(91, 17);
             this.ditherCB.TabIndex = 9;
-            this.ditherCB.Text = "Dither image";
+            this.ditherCB.Text = "Dither image?";
             this.ditherCB.UseVisualStyleBackColor = true;
             // 
             // previewWorker
             // 
             this.previewWorker.WorkerSupportsCancellation = true;
             this.previewWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.PreviewWorker_DoWork);
-            this.previewWorker.RunWorkerCompleted += this.PreviewWorker_RunWorkerCompleted;
+            this.previewWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.PreviewWorker_RunWorkerCompleted);
             // 
             // patternWorker
             // 
             this.patternWorker.WorkerSupportsCancellation = true;
             this.patternWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.PatternWorker_DoWork);
-            this.patternWorker.RunWorkerCompleted += this.PatternWorker_RunWorkerCompleted;
+            this.patternWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.PatternWorker_RunWorkerCompleted);
             // 
-            // Form1
+            // labelPatternOptions1
+            // 
+            this.labelPatternOptions1.AutoSize = true;
+            this.labelPatternOptions1.Location = new System.Drawing.Point(10, 33);
+            this.labelPatternOptions1.Name = "labelPatternOptions1";
+            this.labelPatternOptions1.Size = new System.Drawing.Size(78, 13);
+            this.labelPatternOptions1.TabIndex = 10;
+            this.labelPatternOptions1.Text = "Pattern options";
+            // 
+            // PatternMakerMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(277, 89);
+            this.ClientSize = new System.Drawing.Size(325, 113);
+            this.Controls.Add(this.labelPatternOptions1);
             this.Controls.Add(this.ditherCB);
             this.Controls.Add(this.FolderNameBox);
             this.Controls.Add(this.SaveLabel);
@@ -147,7 +158,7 @@
             this.Controls.Add(this.crossStitchButton);
             this.Controls.Add(this.previewButton);
             this.Controls.Add(this.browseButton);
-            this.Name = "Form1";
+            this.Name = "PatternMakerMainForm";
             this.Text = "Cross Stitch Pattern Maker";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
@@ -167,6 +178,7 @@
         private System.Windows.Forms.CheckBox ditherCB;
         private System.ComponentModel.BackgroundWorker previewWorker;
         private System.ComponentModel.BackgroundWorker patternWorker;
+        private System.Windows.Forms.Label labelPatternOptions1;
     }
 }
 

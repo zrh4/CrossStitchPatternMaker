@@ -40,7 +40,7 @@ namespace CrossStitchPatternMaker
         {
             crossStitchButton.Enabled = false;
             ShowWaitCursor();
-            if (!previewWorker.IsBusy)
+            if (!patternWorker.IsBusy)
             {
                 patternWorker.RunWorkerAsync();
             }
@@ -82,22 +82,29 @@ namespace CrossStitchPatternMaker
         }
         private void PreviewWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            previewButton.Enabled = true;
             ShowNormalCursor();
+            previewButton.Enabled = true;
             if (e.Result == null) { return; }
-            var preview = (Bitmap)e.Result;
-            using (var previewForm = new Form())
+            try
             {
-                previewForm.StartPosition = FormStartPosition.CenterScreen;
-                previewForm.Width = preview.Width + 50;
-                previewForm.Height = preview.Height + 50;
-                var pb = new PictureBox
+                var preview = (Bitmap)e.Result;
+                using (var previewForm = new Form())
                 {
-                    Dock = DockStyle.Fill,
-                    Image = preview
-                };
-                previewForm.Controls.Add(pb);
-                previewForm.ShowDialog();
+                    previewForm.StartPosition = FormStartPosition.CenterScreen;
+                    previewForm.Width = preview.Width + 50;
+                    previewForm.Height = preview.Height + 50;
+                    var pb = new PictureBox
+                    {
+                        Dock = DockStyle.Fill,
+                        Image = preview
+                    };
+                    previewForm.Controls.Add(pb);
+                    previewForm.ShowDialog();
+                }
+            }
+            catch(Exception ex)
+            {
+                DisplayException("Error generating preview", ex);
             }
         }
 
